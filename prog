@@ -1,0 +1,398 @@
+1. Write a program that contains a string (char pointer) with a value ‘Hello world’. The program should XOR and AND each character in this string with 0 and 127, and display the result.
+public class XorAnd {
+    public static void main(String[] args) {
+        String str = "Hello World";
+        System.out.println("Original: " + str);
+        System.out.print("XOR with 0: ");
+        for (int i = 0; i < str.length(); i++) {
+            System.out.print((char)(str.charAt(i) ^ 0));
+        }
+        System.out.print("\nAND with 127: ");
+        for (int i = 0; i < str.length(); i++) {
+            System.out.print((char)(str.charAt(i) & 127));
+        }
+    }
+}
+========================================
+2a. Caeser Cipher
+import java.util.Scanner;
+
+public class CaesarCipher {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter text (UPPERCASE): ");
+        String text = sc.next();
+
+        System.out.print("Enter key: ");
+        int key = sc.nextInt();
+
+        String enc = "";
+        String dec = "";
+
+        for(int i=0;i<text.length();i++)
+        {
+            char ch = text.charAt(i);
+
+            enc += (char)((ch-'A'+key)%26+'A');
+        }
+
+        System.out.println("Encrypted : "+enc);
+
+        for(int i=0;i<enc.length();i++)
+        {
+            char ch = enc.charAt(i);
+
+            dec += (char)((ch-'A'-key+26)%26+'A');
+        }
+
+        System.out.println("Decrypted : "+dec);
+    }
+}
+=======================
+2b. Hill Cipher
+
+import java.util.Scanner;
+
+public class HillCipher {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Encryption key
+        int key[][] = {
+                {3, 3},
+                {2, 5}
+        };
+
+        // Inverse key matrix (mod 26)
+        int invKey[][] = {
+                {15, 17},
+                {20, 9}
+        };
+
+        System.out.print("Enter Plain Text (UPPERCASE): ");
+        String text = sc.next().toUpperCase();
+
+        // Make length even
+        if (text.length() % 2 != 0)
+            text += "X";
+
+        String cipher = "";
+
+        // ---------- Encryption ----------
+        for (int i = 0; i < text.length(); i += 2) {
+
+            int a = text.charAt(i) - 'A';
+            int b = text.charAt(i + 1) - 'A';
+
+            int c = (key[0][0] * a + key[0][1] * b) % 26;
+            int d = (key[1][0] * a + key[1][1] * b) % 26;
+
+            cipher += (char) (c + 'A');
+            cipher += (char) (d + 'A');
+        }
+
+        System.out.println("Encrypted Text : " + cipher);
+
+        // ---------- Decryption ----------
+        String plain = "";
+
+        for (int i = 0; i < cipher.length(); i += 2) {
+
+            int c = cipher.charAt(i) - 'A';
+            int d = cipher.charAt(i + 1) - 'A';
+
+            int a = (invKey[0][0] * c + invKey[0][1] * d) % 26;
+            int b = (invKey[1][0] * c + invKey[1][1] * d) % 26;
+
+            plain += (char) (a + 'A');
+            plain += (char) (b + 'A');
+        }
+
+        System.out.println("Decrypted Text : " + plain);
+    }
+}
+======================
+3a. DES algorithm
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.util.Base64;
+import java.util.*;
+public class DESExample {
+
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc=new Scanner(System.in);
+        // Generate DES Key
+        KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+        SecretKey key = keyGen.generateKey();
+
+        // Create Cipher
+        Cipher cipher = Cipher.getInstance("DES");
+
+        System.out.print("Enter string: ");
+        String plainText = sc.next();
+
+        // Encryption
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encrypted = cipher.doFinal(plainText.getBytes());
+
+        System.out.println("Original Text  : " + plainText);
+        System.out.println("Encrypted Text : " +
+                Base64.getEncoder().encodeToString(encrypted));
+
+        // Decryption
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decrypted = cipher.doFinal(encrypted);
+
+        System.out.println("Decrypted Text : " +
+                new String(decrypted));
+    }
+}
+===========================
+3b. AES algorithm
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.util.Base64;
+import java.util.*;
+
+public class AESExample {
+
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Generate AES Key
+        KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+        keyGen.init(128);          // AES Key Size
+        SecretKey key = keyGen.generateKey();
+
+        // Create Cipher
+        Cipher cipher = Cipher.getInstance("AES");
+
+        System.out.print("Enter string: ");
+        String plainText = sc.next();
+
+        // Encryption
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encrypted = cipher.doFinal(plainText.getBytes());
+
+        System.out.println("Original Text  : " + plainText);
+        System.out.println("Encrypted Text : "
+                + Base64.getEncoder().encodeToString(encrypted));
+
+        // Decryption
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decrypted = cipher.doFinal(encrypted);
+
+        System.out.println("Decrypted Text : "
+                + new String(decrypted));
+    }
+}
+==========================
+3c. Blowfish
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.util.Base64;
+import java.util.*;
+
+public class BlowfishExample {
+
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Generate Blowfish Key
+        KeyGenerator keyGen = KeyGenerator.getInstance("Blowfish");
+        SecretKey key = keyGen.generateKey();
+
+        // Create Cipher
+        Cipher cipher = Cipher.getInstance("Blowfish");
+
+        System.out.print("Enter string: ");
+        String plainText = sc.next();
+
+        // Encryption
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encrypted = cipher.doFinal(plainText.getBytes());
+
+        System.out.println("Original Text  : " + plainText);
+        System.out.println("Encrypted Text : "
+                + Base64.getEncoder().encodeToString(encrypted));
+
+        // Decryption
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decrypted = cipher.doFinal(encrypted);
+
+        System.out.println("Decrypted Text : "
+                + new String(decrypted));
+    }
+}
+====================
+3d. RC4 algorithm ------If RC4 gives error replace it with "ARCFOUR" everywhere in code in place of RC4
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import java.util.Base64;
+import java.util.*;
+
+public class RC4Example {
+
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Generate RC4 Key
+        KeyGenerator keyGen = KeyGenerator.getInstance("RC4");
+        SecretKey key = keyGen.generateKey();
+
+        // Create Cipher
+        Cipher cipher = Cipher.getInstance("RC4");
+
+        System.out.print("Enter string: ");
+        String plainText = sc.next();
+
+        // Encryption
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encrypted = cipher.doFinal(plainText.getBytes());
+
+        System.out.println("Original Text  : " + plainText);
+        System.out.println("Encrypted Text : "
+                + Base64.getEncoder().encodeToString(encrypted));
+
+        // Decryption
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decrypted = cipher.doFinal(encrypted);
+
+        System.out.println("Decrypted Text : "
+                + new String(decrypted));
+    }
+}
+=====================
+4. Blowfish using java key tool (hello world)
+import javax.crypto.*;
+import java.util.Base64;
+
+public class BlowfishDemo {
+    public static void main(String[] args) throws Exception {
+        KeyGenerator kg = KeyGenerator.getInstance("Blowfish");
+        SecretKey key = kg.generateKey();
+
+        Cipher c = Cipher.getInstance("Blowfish");
+        c.init(Cipher.ENCRYPT_MODE, key);
+
+        byte[] data = c.doFinal("Hello world".getBytes());
+        System.out.println("Encrypted: " +
+            Base64.getEncoder().encodeToString(data));
+    }
+}
+===============================
+5.Write a program to implement the RSA algorithm.
+
+import javax.crypto.*;
+import java.security.*;
+import java.util.Scanner;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter text: ");
+        String msg = sc.nextLine();
+
+        KeyPairGenerator k = KeyPairGenerator.getInstance("RSA");
+        KeyPair kp = k.generateKeyPair();
+
+        Cipher c = Cipher.getInstance("RSA");
+        c.init(Cipher.ENCRYPT_MODE, kp.getPublic());
+        byte[] e = c.doFinal(msg.getBytes());
+        System.out.println("Encrypted: " + new String(e));
+
+        c.init(Cipher.DECRYPT_MODE, kp.getPrivate());
+        byte[] d = c.doFinal(e);
+        System.out.println("Decrypted: " + new String(d));
+    }
+}
+
+=====================================
+6. Implement the Diffie-Hellman Key Exchange mechanism using HTML and JavaScript.
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { background-color: lightyellow; font-family: Arial; }
+h3 { color: blue; }
+</style>
+</head>
+<body>
+
+<h3>Diffie-Hellman Key Exchange</h3>
+
+<script>
+let p = 23, g = 5;
+let a = 6, b = 15;
+
+let A = (g ** a) % p;
+let B = (g ** b) % p;
+
+let keyA = (B ** a) % p;
+let keyB = (A ** b) % p;
+
+document.write("Public value A: " + A + "<br>");
+document.write("Public value B: " + B + "<br>");
+document.write("Shared key A: " + keyA + "<br>");
+document.write("Shared key B: " + keyB);
+</script>
+
+</body>
+</html>
+=========================================
+7. Calculate the message digest of a text using
+a. SHA-512 algorithm.
+b. MD5 algorithm.
+
+7a - SHA-512 algorithm
+
+import java.security.MessageDigest;
+
+public class SHA512Demo {
+    public static void main(String[] args) throws Exception {
+        String text = "Hello world";
+
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
+        byte[] data = md.digest(text.getBytes());
+
+        String result = "";
+        for (byte b : data) {
+            result += String.format("%02x", b & 0xff);
+        }
+
+        System.out.println("SHA-512: " + result);
+    }
+}
+
+
+
+7b - MD5 hashing algorithm
+import java.security.MessageDigest;
+
+public class MD5Demo {
+    public static void main(String[] args) throws Exception {
+        String text = "Hello world";
+
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] data = md.digest(text.getBytes());
+
+        String result = "";
+        for (byte b : data) {
+            result += String.format("%02x", b & 0xff);
+        }
+
+        System.out.println("MD5: " + result);
+    }
+}
