@@ -69,3 +69,10 @@ algebra.l
 .         return yytext[0];
 
 %%
+
+nano algebra.y
+yacc -d algebra.y
+nano algebra.l
+lex algebra.l
+gcc y.tab.c lex.yy.c -ll -o algebra
+./algebra
