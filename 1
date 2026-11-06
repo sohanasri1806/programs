@@ -46,3 +46,295 @@ int main()
 vim f.c
 gcc f.c
 ./a.out
+
+
+1. Lex program to count the number of vowels in an input string
+%{
+#include <stdio.h>
+int count = 0;
+%}
+
+%%
+
+[aeiouAEIOU]    { count++; }
+.               ;
+\n              ;
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter a string:\n");
+    yylex();
+
+    printf("Number of vowels = %d\n", count);
+
+    return 0;
+}
+
+Lex program to count characters, tabs, spaces and reserved words
+%{
+#include <stdio.h>
+
+int characters = 0;
+int tabs = 0;
+int spaces = 0;
+int reserved = 0;
+%}
+
+%%
+
+"int"|"float"|"char"|"double"|"if"|"else"|"while"|"for"|"return"|"void"|"break"|"switch"|"case"|"do"|"continue"
+    {
+        reserved++;
+        characters += yyleng;
+    }
+
+\t      { tabs++; characters++; }
+" "     { spaces++; characters++; }
+\n      ;
+.       { characters++; }
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter input:\n");
+    yylex();
+
+    printf("\nCharacters = %d", characters);
+    printf("\nTabs = %d", tabs);
+    printf("\nSpaces = %d", spaces);
+    printf("\nReserved words = %d\n", reserved);
+
+    return 0;
+}
+
+Lex program to check whether an input integer is positive or negative
+%{
+#include <stdio.h>
+%}
+
+%%
+
+[+]?[0-9]+     { printf("Positive number\n"); }
+-[0-9]+        { printf("Negative number\n"); }
+0              { printf("Zero\n"); }
+\n             ;
+.              { printf("Invalid input\n"); }
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter an integer:\n");
+    yylex();
+
+    return 0;
+}
+
+Lex program to check whether a given pattern occurs in input text and count the number of matches
+%{
+#include <stdio.h>
+int count = 0;
+%}
+
+%%
+
+"abc"    { count++; }
+\n       ;
+.        ;
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter text:\n");
+    yylex();
+
+    if(count > 0)
+        printf("Pattern found\n");
+    else
+        printf("Pattern not found\n");
+
+    printf("Number of matches = %d\n", count);
+
+    return 0;
+}
+5. Lex program to count words with length greater than 5 and less than 10
+%{
+#include <stdio.h>
+int count = 0;
+%}
+
+%%
+
+[A-Za-z]+
+{
+    if(yyleng > 5 && yyleng < 10)
+        count++;
+}
+
+[ \t\n]+    ;
+.           ;
+
+%%
+
+int yywrap()
+{
+    return 1;
+}
+
+int main()
+{
+    printf("Enter a string:\n");
+    yylex();
+
+    printf("Number of words with length > 5 and < 10 = %d\n", count);
+
+    return 0;
+}
+
+Follow set
+#include <stdio.h>
+
+char FOLLOW_E[10];
+char FOLLOW_T[10];
+char FOLLOW_F[10];
+
+int e = 0, t = 0, f = 0;
+
+void add(char set[], int *n, char c)
+{
+    int i;
+
+    for(i = 0; i < *n; i++)
+    {
+        if(set[i] == c)
+            return;
+    }
+
+    set[*n] = c;
+    (*n)++;
+}
+
+void follow()
+{
+    int i;
+
+    // FOLLOW(E)
+    add(FOLLOW_E, &e, '$');
+    add(FOLLOW_E, &e, ')');
+    add(FOLLOW_E, &e, '+');
+
+    // FOLLOW(T)
+    add(FOLLOW_T, &t, '*');
+
+    // Add FOLLOW(E) to FOLLOW(T)
+    for(i = 0; i < e; i++)
+        add(FOLLOW_T, &t, FOLLOW_E[i]);
+
+    // Add FOLLOW(T) to FOLLOW(F)
+    for(i = 0; i < t; i++)
+        add(FOLLOW_F, &f, FOLLOW_T[i]);
+}
+
+void display(char name, char set[], int n)
+{
+    int i;
+
+    printf("FOLLOW(%c) = { ", name);
+
+    for(i = 0; i < n; i++)
+        printf("%c ", set[i]);
+
+    printf("}\n");
+}
+
+int main()
+{
+    follow();
+
+    printf("FOLLOW SETS:\n");
+
+    display('E', FOLLOW_E, e);
+    display('T', FOLLOW_T, t);
+    display('F', FOLLOW_F, f);
+
+    return 0;
+}
+
+infix to postfix
+.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%token ID
+%left '+' '-'
+%left '*' '/'
+
+%%
+E : E '+' E  { printf("+"); }
+  | E '-' E  { printf("-"); }
+  | E '*' E  { printf("*"); }
+  | E '/' E  { printf("/"); }
+  | '(' E ')'
+  | ID       { printf("%c", yylval); }
+  ;
+%%
+
+int main()
+{
+    printf("Enter infix expression: ");
+    yyparse();
+    printf("\n");
+    return 0;
+}
+
+int yyerror(char *s)
+{
+    printf("Invalid expression\n");
+    return 0;
+}
+
+.l
+
+%{
+#include "y.tab.h"
+%}
+
+%%
+[a-zA-Z]    { yylval = yytext[0]; return ID; }
+[0-9]       { yylval = yytext[0]; return ID; }
+[+\-*/()]   { return yytext[0]; }
+[ \t\n]     ;
+.           { return yytext[0]; }
+%%
+
+int yywrap()
+{
+    return 1;
+}
