@@ -176,3 +176,8 @@ calc.l
 .           { return yytext[0]; }
 
 %%
+nano expr.y
+yacc -d expr.y
+lex expr.l
+cc y.tab.c lex.yy.c -ll -o expr
+./expr
