@@ -79,3 +79,7 @@ int main()
 
     return 0;
 }
+
+vim stack.c
+gcc stack.c
+./a.out
