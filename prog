@@ -1,45 +1,4 @@
 
-4.Write a lex program to count the number of words and number of lines in a given file
-or program.
-
-%{
-#include<stdio.h>
-
-int lines = 0, words = 0;
-%}
-
-%%
-
-[ \t]+ ;
-
-\n { lines++; }
-
-[^ \t\n]+ { words++; }
-
-%%
-
-int yywrap()
-{
-    return 1;
-}
-
-int main()
-{
-    printf("Enter the text (Press Ctrl+D to end input):\n");
-
-    yylex();
-
-    if(words > 0 && lines == 0)
-        lines = 1;
-    else if(words > 0)
-        lines++;
-
-    printf("\nNumber of lines = %d\n", lines);
-    printf("Number of words = %d\n", words);
-
-    return 0;
-}
-==================================
 5. Generate YACC specification for a few syntactic categories.
 a. Program to recognize a valid arithmetic expression that uses operators +,-, *, and /.
 b. Program to recognize a valid variable that starts with a letter followed by any number of
